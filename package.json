@@ -1,0 +1,25 @@
+{
+	"name": "collaborative-network-tool",
+	"version": "1.0.0",
+	"description": "Create easily your own collaborative network",
+	"main": "app.js",
+	"scripts": {
+		"start": "node app.js",
+        "release": "node build.js --release",
+        "build": "node build.js"
+	},
+	"engines": {
+		"node": ">=0.10.0"
+	},
+	"files": [
+		"app.js"
+	],
+	"author": "Thiago Nascimento",
+	"license": "MIT",
+	"homepage": "http://thiagodnf.github.io/collaborative-network-tool",
+	"dependencies": {
+		"serve-static": "",
+		"connect": "",
+		"network":""
+  	}
+}
