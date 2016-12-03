@@ -38,8 +38,52 @@ function isAValidURL(url){
     return re_weburl.test(url);
 }
 
+function getQueryParams(qs) {
+    qs = qs.split('+').join(' ');
+
+    var params = {},
+        tokens,
+        re = /[?&]?([^=]+)=([^&]*)/g;
+
+    while (tokens = re.exec(qs)) {
+        params[decodeURIComponent(tokens[1])] = decodeURIComponent(tokens[2]);
+    }
+
+    return params;
+}
+
+function showLoading(){
+    var x = ($(window).width()/2)-40;
+    var y = $(window).height()/2;
+
+    var str = "<image href='img/loading.gif' width='20' height='20' x='"+(x-25)+"' y='"+(y-15)+"'></image>";
+    str += "<text x='"+x+"' y='"+y+"'>Loading...</text>";
+
+    $("svg").html(str)
+}
+
 function exportToPNG(){
     saveAs(new Blob(['<svg>'+$("#svg-canvas").html()+"</svg>"], {type:"application/svg+xml"}), "name.svg");
+}
+
+function loadURL(type, url){
+    if( ! type || ! url){
+        return alert("The type and URL parameters are required for loading a URL");
+    }
+
+    if( ! isAValidURL(url)){
+        return alert("The url paramter is not a valid url");
+    }
+
+    showLoading();
+
+    $.get(url, function( data ) {
+        if(type == "bibtex"){
+            importBibtex(data);
+        }else{
+            alert("The type parameter is not a valid type.");
+        }
+    });
 }
 
 function importBibtex(bibtex){
@@ -55,8 +99,6 @@ $(function(){
     // Add custom validation ruless
     $.formUtils.addValidator(NodesValidation.getRule());
     $.formUtils.addValidator(EdgesValidation.getRule());
-
-    plotCollaborationNetwork();
 
     $("#btn-export-to-png").click(function(){
         exportToPNG();
@@ -93,9 +135,7 @@ $(function(){
          var bibtex = $("#input-bibtex").val();
 
          if(isAValidURL(bibtex)){
-             $.get(bibtex, function( data ) {
-                 importBibtex(data);
-             });
+             loadURL("bibtex", bibtex);
          }else{
              importBibtex(bibtex);
          }
@@ -103,4 +143,13 @@ $(function(){
          return false;
     }});
 
+    // Open a url passed by parameters
+
+    var parameters = getQueryParams(document.location.search);
+
+    if(parameters.type && parameters.url){
+        loadURL(parameters.type, parameters.url);
+    }else{
+        plotCollaborationNetwork();
+    }
 });
